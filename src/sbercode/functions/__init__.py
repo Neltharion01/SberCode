@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: 0BSD
+# Copyright 2026 Neltharion01
+
 from sbercode.colors import *;
 
 from sbercode.functions.run_command import RunCommand;

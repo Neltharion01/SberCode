@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: 0BSD
+# Copyright 2026 Neltharion01
+
 import subprocess;
 
 from sbercode.colors import *;

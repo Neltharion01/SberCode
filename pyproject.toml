@@ -3,9 +3,8 @@ name = "sbercode"
 version = "0.1.0"
 description = "AI coding assistant"
 readme = "README.md"
-authors = [
-    { name = "Neltharion", email = "NtNeltharion@gmail.com" }
-]
+authors = [{ name = "Neltharion", email = "NtNeltharion@gmail.com" }]
+license = { text = "0BSD" }
 requires-python = ">=3.14"
 dependencies = [
     "httpx[http2]>=0.28.1",

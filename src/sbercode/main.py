@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: 0BSD
+# Copyright 2026 Neltharion01
+
 import os;
 import json;
 from pathlib import Path;
