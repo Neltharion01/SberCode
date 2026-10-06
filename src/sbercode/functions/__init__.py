@@ -4,6 +4,9 @@
 from sbercode.colors import *;
 
 from sbercode.functions.run_command import RunCommand;
+from sbercode.functions.read_file import ReadFile;
+from sbercode.functions.write_file import WriteFile;
+from sbercode.functions.edit_file import EditFile;
 
 class FunctionNotFound:
     def __init__(self, name):
@@ -15,7 +18,10 @@ class FunctionNotFound:
 
 class Functions:
     functions = {
-        "run_command": RunCommand()
+        "run_command": RunCommand(),
+        "read_file": ReadFile(),
+        "write_file": WriteFile(),
+        "edit_file": EditFile(),
     };
 
     def serialize():

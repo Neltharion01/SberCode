@@ -58,7 +58,7 @@ class RunCommand:
         cmd = subprocess.Popen(["bash", "-c", args["command"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True);
         stdout, stderr = cmd.communicate(input=args.get("stdin"), timeout=args["timeout"]);
         print(stdout, end="");
-        print(stderr);
+        print(stderr, end="");
         return { "stdout": stdout, "stderr": stderr };
     def print_args(self, args):
         print("\n  " + WHITE + "$ " + args["command"] + RESET);

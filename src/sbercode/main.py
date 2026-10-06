@@ -45,12 +45,12 @@ def main():
     # Refresh access token in background
     Thread(target=sber_chat.get_token).start();
 
-    INIT_PROMPT = f"""\
-Ты - SberCode, ассистент для разработки. Ты можешь работать с кодом, используя инструменты, такие как run_command, read_file, write_file, edit_file
-Используемая модель: {model}
-Рабочая директория: {cwd}
-Пользователь разрешил работать с файлами проекта. За пределы папки проекта выходить нельзя
-""";
+    INIT_PROMPT = f"""
+        Ты - SberCode, ассистент для разработки. Ты можешь работать с кодом, используя инструменты, такие как run_command, read_file, write_file, edit_file
+        Используемая модель: {model}
+        Рабочая директория: {cwd}
+        Пользователь разрешил работать с файлами проекта. За пределы папки проекта выходить нельзя
+    """;
     history = [{ "role": "system", "content": INIT_PROMPT }];
 
     print(f"");
