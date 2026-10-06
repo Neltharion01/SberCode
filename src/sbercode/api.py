@@ -15,7 +15,7 @@ BASE_URL = "https://api.giga.chat/v1/chat/completions";
 
 def make_client():
     ssl_ctx = ssl.create_default_context(cadata=RUSSIAN_TRUSTED_ROOT_CA);
-    timeout = httpx.Timeout(10);
+    timeout = httpx.Timeout(None);
     return httpx.Client(http2=True, verify=ssl_ctx, timeout=timeout);
 
 @dataclass
