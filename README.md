@@ -31,6 +31,11 @@ uv run sbercode
 
 And you are ready
 
+If you want to install persistently, run:
+```
+uv tool install .
+```
+
 # License
 ```
 # Copyright 2026 Neltharion01
