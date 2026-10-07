@@ -1,76 +1,40 @@
 # SberCode
 
-**SberCode** — это терминальный AI-ассистент для разработки, который позволяет взаимодействовать с моделью GigaChat прямо из командной строки. Главная особенность ассистента — возможность выполнять действия с кодом и файловой системой по вашему запросу.
+**SberCode** is a very dumb AI coding assistant. It is like OpenCode, but funnier in every way. Unfortunately, GigaChat models are way too underperforming for any real coding tasks
 
-## Возможности
+### Features
+- Reads, writes, edits files
+- Runs commands
+- Run this command? `echo I am not able to use terminal`
+- `python -m pip install pip install pip install pip install pip install pip install...`
 
-Ассистент может использовать следующие инструменты для помощи в разработке:
+## Installation and running
 
--   **`read_file`**: Прочитать содержимое файла.
--   **`write_file`**: Создать новый файл с указанным содержимым.
--   **`edit_file`**: Внести изменения в существующий файл (поиск и замена).
--   **`run_command`**: Выполнить команду в оболочке (в пределах текущей директории).
+### 1. Get an API key
 
-## Установка и запуск
+Follow <https://developers.sber.ru/docs/ru/gigachat/quickstart/ind-create-project>. To register, you need a russian phone number - you don't have to be Sberbank's client. API key is free, and limits are quite sizeable (resets yearly)
 
-### 1. Установка зависимостей
-
-Проект использует `uv` для управления зависимостями. Убедитесь, что он установлен, а затем выполните:
-
-```bash
-uv sync
+After obtaining it, edit `~/.config/sbercode/config.json` and add your API key:
+```json
+{
+    "token": "YOUR_BASIC_AUTH_TOKEN",
+    "model": "GigaChat-3-Ultra"
+}
 ```
 
-Это создаст виртуальное окружение и установит необходимые пакеты.
+### 2. Run
 
-### 2. Настройка
-
-Перед первым запуском необходимо создать файл конфигурации.
-
-1.  Скопируйте пример конфигурации:
-    ```bash
-    cp config_example.json ~/.config/sbercode/config.json
-    ```
-2.  Отредактируйте файл `~/.config/sbercode/config.json`, добавив ваш API-токен Sber и, при необходимости, выбрав другую модель:
-
-    ```json
-    {
-        "token": "ВАШ_BASIC_AUTH_ТОКЕН",
-        "model": "GigaChat-3-Ultra"
-    }
-    ```
-
-### 3. Запуск
-
-Активируйте виртуальное окружение и запустите ассистент:
-
-```bash
+This project uses `uv` to manage dependencies. Simply run:
+```
 uv run sbercode
 ```
 
-## Использование
+And you are ready
 
-После запуска вы увидите приглашение к вводу. Опишите задачу на естественном языке.
-
-**Пример диалога:**
-
+# License
 ```
-  + Your message: Создай файл hello.py с функцией, которая выводит "Привет, мир!"
-  + Write file hello.py
-+ def greet():
-+     print("Привет, мир!")
-+ 
-+ if __name__ == "__main__":
-+     greet()
-  + Your message: Запусти этот файл
-  $ python hello.py
-Привет, мир!
+# Copyright 2026 Neltharion01
+# SPDX-License-Identifier: 0BSD
 ```
 
-## Выход из программы
-
-Для завершения работы нажмите `Ctrl+C` и `Enter`, либо `Ctrl+D`.
-
-## Лицензия
-
-0BSD. Лицензия находится в корне репозитория. Контрибьюторы указаны в `pyproject.toml`.
+Feel free to reuse
