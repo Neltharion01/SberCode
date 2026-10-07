@@ -7,6 +7,7 @@ from sbercode.functions.run_command import RunCommand;
 from sbercode.functions.read_file import ReadFile;
 from sbercode.functions.write_file import WriteFile;
 from sbercode.functions.edit_file import EditFile;
+from sbercode.functions.web_fetch import WebFetch;
 
 class FunctionNotFound:
     def __init__(self, name):
@@ -22,6 +23,7 @@ class Functions:
         "read_file": ReadFile(),
         "write_file": WriteFile(),
         "edit_file": EditFile(),
+        "web_fetch": WebFetch(),
     };
 
     def serialize():
