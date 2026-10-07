@@ -17,14 +17,18 @@ RUN_COMMAND_FUNCTION = {
             },
             "timeout": {
                 "type": "integer",
-                "description": "Timeout в секундах. Рекомендуемое значение - 10 секунд"
+                "description": "Timeout в секундах. Рекомендуемое значение - 10 секунд. Если background задан как true, то timeout игнорируется"
             },
             "stdin": {
                 "type": "string",
                 "description": "Строка, которая будет отправлена в stdin"
+            },
+            "background": {
+                "type": "boolean",
+                "description": "Если True, команда будет запущена в фоновом режиме"
             }
         },
-        "required": [ "command", "timeout" ]
+        "required": [ "command" ]
     },
     "few_shot_examples": [
         {
@@ -38,8 +42,16 @@ RUN_COMMAND_FUNCTION = {
     "return_parameters": {
         "type": "object",
         "properties": {
+            "status": {
+                "type": "string",
+                "description": "Статус выполнения"
+            },
             "stdout": { "type": "string" },
             "stderr": { "type": "string" },
+            "exit_code": {
+                "type": "integer",
+                "description": "Код завершения"
+            },
             "error": {
                 "type": "string",
                 "description": "Возвращается при возникновении ошибки. Содержит описание ошибки"
@@ -56,9 +68,16 @@ class RunCommand:
             if i != "y":
                 return { "error": "User denied execution of this command" };
         cmd = subprocess.Popen(["bash", "-c", args["command"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True);
-        stdout, stderr = cmd.communicate(input=args.get("stdin"), timeout=args["timeout"]);
+        if args.get("background"):
+            return { "status": "command spawned successfully" };
+        stdout, stderr = cmd.communicate(input=args.get("stdin"), timeout=args.get("timeout", 10));
         print(stdout, end="");
         print(stderr, end="");
-        return { "stdout": stdout, "stderr": stderr };
+        code = cmd.wait();
+        return { "status": "success", "stdout": stdout, "stderr": stderr, "exit_code": code };
     def print_args(self, args):
-        print("  " + WHITE + "$ " + args["command"] + RESET);
+        if args.get("background"):
+            bg = " &";
+        else:
+            bg = "";
+        print("  " + WHITE + "$ " + args["command"] + bg + RESET);
