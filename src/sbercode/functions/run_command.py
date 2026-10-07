@@ -17,7 +17,8 @@ RUN_COMMAND_FUNCTION = {
             },
             "timeout": {
                 "type": "integer",
-                "description": "Timeout в секундах. Рекомендуемое значение - 10 секунд. Если background задан как true, то timeout игнорируется"
+                "description": "Timeout в секундах. Если background задан как true, то timeout игнорируется",
+                "default": 10
             },
             "stdin": {
                 "type": "string",
@@ -34,8 +35,7 @@ RUN_COMMAND_FUNCTION = {
         {
             "request": "Проверим версию python",
             "params": {
-                "command": "python -v",
-                "timeout": 10
+                "command": "python -v"
             }
         }
     ],
