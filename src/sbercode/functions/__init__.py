@@ -8,6 +8,10 @@ from sbercode.functions.read_file import ReadFile;
 from sbercode.functions.write_file import WriteFile;
 from sbercode.functions.edit_file import EditFile;
 from sbercode.functions.web_fetch import WebFetch;
+from sbercode.functions.list_files import ListFiles;
+from sbercode.functions.create_dir import CreateDir;
+from sbercode.functions.remove_file import RemoveFile;
+from sbercode.functions.remove_dir import RemoveDir;
 
 class FunctionNotFound:
     def __init__(self, name):
@@ -24,6 +28,10 @@ class Functions:
         "write_file": WriteFile(),
         "edit_file": EditFile(),
         "web_fetch": WebFetch(),
+        "list_files": ListFiles(),
+        "create_dir": CreateDir(),
+        "remove_file": RemoveFile(),
+        "remove_dir": RemoveDir(),
     };
 
     def serialize():
