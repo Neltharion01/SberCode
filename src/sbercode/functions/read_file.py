@@ -47,4 +47,4 @@ class ReadFile:
         f.close();
         return { "contents": data };
     def print_args(self, args):
-        print(f"\n  {YELLOW}+ Read file {WHITE}{args["file_name"]}{RESET}");
+        print(f"  {YELLOW}+ Read file {WHITE}{args["file_name"]}{RESET}");

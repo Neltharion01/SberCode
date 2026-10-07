@@ -55,7 +55,7 @@ class EditFile:
         f = open(args["file_name"], "r+");
         data = f.read();
         if args["replace_from"] not in data:
-            print("Error: substring not found");
+            print(f"  {BRED}[X] Error: substring not found{RESET}");
             return { "error": "substring not found" };
         data = data.replace(args["replace_from"], args["replace_to"]);
         f.seek(0);
@@ -64,7 +64,7 @@ class EditFile:
         f.close();
         return { "status": "success" };
     def print_args(self, args):
-        print(f"\n  {YELLOW}+ Edit file {WHITE}{args["file_name"]}{RESET}");
+        print(f"  {YELLOW}+ Edit file {WHITE}{args["file_name"]}{RESET}");
         for line in args["replace_from"].splitlines():
             print(BRED + "- " + RESET + line);
         for line in args["replace_to"].splitlines():

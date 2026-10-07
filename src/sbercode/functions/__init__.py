@@ -14,7 +14,7 @@ class FunctionNotFound:
     def run(self, args):
         return { "error": f"function {self.name} not found" };
     def print_args(self, args):
-        print(f"  {BRED}+ Function {self.name} not found{RESET}");
+        print(f"  {BRED}[X] Function {self.name} not found{RESET}");
 
 class Functions:
     functions = {
@@ -35,6 +35,6 @@ class Functions:
         except Exception as e:
             e_name = type(e).__name__;
             text = f"{e_name}: {e}";
-            print(text);
+            print(f"  {BRED}[X] {text}{RESET}");
             ret = { "error": text };
         return ret;

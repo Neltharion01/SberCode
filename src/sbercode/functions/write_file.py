@@ -54,6 +54,6 @@ class WriteFile:
         f.close();
         return { "status": "success" };
     def print_args(self, args):
-        print(f"\n  {YELLOW}+ Write file {WHITE}{args["file_name"]}{RESET}");
+        print(f"  {YELLOW}+ Write file {WHITE}{args["file_name"]}{RESET}");
         for line in args["contents"].splitlines():
             print(BGREEN + "+ " + RESET + line);

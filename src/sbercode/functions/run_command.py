@@ -61,4 +61,4 @@ class RunCommand:
         print(stderr, end="");
         return { "stdout": stdout, "stderr": stderr };
     def print_args(self, args):
-        print("\n  " + WHITE + "$ " + args["command"] + RESET);
+        print("  " + WHITE + "$ " + args["command"] + RESET);
