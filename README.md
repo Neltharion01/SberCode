@@ -1,6 +1,6 @@
 # SberCode
 
-**SberCode** is a very dumb AI coding assistant. It is like OpenCode, but funnier in every way. Unfortunately, GigaChat models are way too underperforming for any real coding tasks
+**SberCode** is a very dumb AI coding assistant
 
 ### Features
 - Reads, writes, edits files
