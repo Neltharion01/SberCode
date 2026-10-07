@@ -14,9 +14,14 @@ AUTH_URL = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth";
 BASE_URL = "https://api.giga.chat/v1/chat/completions";
 
 def make_client():
-    ssl_ctx = ssl.create_default_context(cadata=RUSSIAN_TRUSTED_ROOT_CA);
-    timeout = httpx.Timeout(None);
-    return httpx.Client(http2=True, verify=ssl_ctx, timeout=timeout);
+    return httpx.Client(
+        transport=httpx.HTTPTransport(
+            http2=True,
+            verify=ssl.create_default_context(cadata=RUSSIAN_TRUSTED_ROOT_CA),
+            retries=3
+        ),
+        timeout=httpx.Timeout(None)
+    );
 
 @dataclass
 class SberChat:
