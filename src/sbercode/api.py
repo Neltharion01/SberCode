@@ -29,7 +29,6 @@ class SberChat:
     model: str = "GigaChat-3-Lightning";
     scope: str = "GIGACHAT_API_PERS";
     access_token: str = None;
-    session_id: str = str(uuid.uuid4());
     http: httpx.Client = make_client();
     functions: list[dict] = field(default_factory=list);
     token_on_save = None;
@@ -50,11 +49,11 @@ class SberChat:
                 self.token_on_save(self.access_token);
         return self.access_token["access_token"];
 
-    def build_headers(self):
+    def build_headers(self, sid):
         return {
             "Authorization": f"Bearer {self.get_token()}",
             "RqUID": str(uuid.uuid4()),
-            "X-Session-Id": self.session_id,
+            "X-Session-Id": sid,
             "Content-Type": "application/json",
             "Accept": "application/json",
         };
@@ -68,16 +67,16 @@ class SberChat:
             "stream": stream,
         };
 
-    def complete(self, history):
-        headers = self.build_headers();
+    def complete(self, history, sid):
+        headers = self.build_headers(sid);
         data = self.build_request(history);
         res = self.http.post(BASE_URL, headers=headers, json=data);
         if res.status_code != 200:
             raise SberChatError(res.json()["message"]);
         return res.json()["choices"][0];
 
-    def complete_stream(self, history):
-        headers = self.build_headers();
+    def complete_stream(self, history, sid):
+        headers = self.build_headers(sid);
         data = self.build_request(history, stream=True);
         with self.http.stream("POST", BASE_URL, headers=headers, json=data) as res:
             if res.status_code != 200:

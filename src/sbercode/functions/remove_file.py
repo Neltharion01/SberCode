@@ -45,13 +45,12 @@ class RemoveFile:
 
     def run(self, args):
         file_name = args["file_name"]
-        # Запрос подтверждения у пользователя
-        i = input(f"  {BRED}[!!!] ВНИМАНИЕ! Удаление файла! Вы точно хотите удалить {WHITE}'{file_name}'{BRED}?{RESET} [y/N] ").strip().lower()
-        if i != "y":
-            return {"error": "User denied execution of this command"}
 
         os.remove(file_name)
         return {"status": f"File '{file_name}' removed successfully."}
 
     def print_args(self, args):
         print(f"  {YELLOW}+ Remove file {WHITE}{args['file_name']}{RESET}")
+
+    def describe(self, args):
+        return f"Remove file {args['file_name']}";

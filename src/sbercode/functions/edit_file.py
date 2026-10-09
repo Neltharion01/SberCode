@@ -51,6 +51,7 @@ EDIT_FILE_FUNCTION = {
 
 class EditFile:
     desc = EDIT_FILE_FUNCTION;
+
     def run(self, args):
         f = open(args["file_name"], "r+");
         data = f.read();
@@ -63,9 +64,13 @@ class EditFile:
         f.write(data);
         f.close();
         return { "status": "success" };
+
     def print_args(self, args):
         print(f"  {YELLOW}+ Edit file {WHITE}{args["file_name"]}{RESET}");
         for line in args["replace_from"].splitlines():
             print(BRED + "- " + RESET + line);
         for line in args["replace_to"].splitlines():
             print(BGREEN + "+ " + RESET + line);
+
+    def describe(self, args):
+        return f"Edit file {args['file_name']}";

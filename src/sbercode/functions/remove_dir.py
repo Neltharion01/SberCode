@@ -46,10 +46,6 @@ class RemoveDir:
 
     def run(self, args):
         path = args["path"]
-        # Запрос подтверждения у пользователя
-        i = input(f"  {BRED}[!!!] ВНИМАНИЕ! Удаление директории! Вы точно хотите удалить {WHITE}'{path}'{BRED} и {BOLD}всё её содержимое?{RESET} [y/N] ").strip().lower()
-        if i != "y":
-            return {"error": "User denied execution of this command"}
 
         # Используем shutil.rmtree для удаления директорий с содержимым
         shutil.rmtree(path)
@@ -57,3 +53,6 @@ class RemoveDir:
 
     def print_args(self, args):
         print(f"  {YELLOW}+ Remove dir {WHITE}{args['path']}{RESET}")
+
+    def describe(self, args):
+        return f"Remove dir {args['path']}";

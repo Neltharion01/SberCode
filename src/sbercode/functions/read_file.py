@@ -41,10 +41,15 @@ READ_FILE_FUNCTION = {
 
 class ReadFile:
     desc = READ_FILE_FUNCTION;
+
     def run(self, args):
         f = open(args["file_name"]);
         data = f.read();
         f.close();
         return { "contents": data };
+
     def print_args(self, args):
         print(f"  {YELLOW}+ Read file {WHITE}{args["file_name"]}{RESET}");
+
+    def describe(self, args):
+        return f"Read file {args['file_name']}";

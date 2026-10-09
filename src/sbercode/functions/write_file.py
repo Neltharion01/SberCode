@@ -46,6 +46,7 @@ WRITE_FILE_FUNCTION = {
 
 class WriteFile:
     desc = WRITE_FILE_FUNCTION;
+
     def run(self, args):
         f = open(args["file_name"], "x");
         f.write(args["contents"]);
@@ -53,7 +54,11 @@ class WriteFile:
             f.write("\n");
         f.close();
         return { "status": "success" };
+
     def print_args(self, args):
         print(f"  {YELLOW}+ Write file {WHITE}{args["file_name"]}{RESET}");
         for line in args["contents"].splitlines():
             print(BGREEN + "+ " + RESET + line);
+
+    def describe(self, args):
+        return f"Write file {args['file_name']}";

@@ -4,13 +4,12 @@
 import os;
 import json;
 from pathlib import Path;
-from threading import Thread;
 from time import sleep
+import uuid;
 
 from sbercode.api import SberChat;
 from sbercode.colors import *;
 from sbercode.functions import Functions;
-from sbercode.history import History;
 
 def make_cfgdir(home):
     dir = home;
@@ -55,60 +54,75 @@ def main():
         accfile.close();
     # Set token on_save function
     sber_chat.token_on_save = acc_on_save;
-    # Refresh access token in background
-    Thread(target=sber_chat.get_token).start();
 
-    INIT_PROMPT = f"""
-        Ты - SberCode, ассистент для разработки. Ты можешь работать с кодом, используя инструменты, такие как run_command, read_file, write_file, edit_file
-        Используемая модель: {model}
-        Рабочая директория: {cwd}
-        Пользователь разрешил работать с файлами проекта. За пределы папки проекта выходить нельзя
-    """;
-    history = History.load();
-    if not history.get():
-        history.append({ "role": "system", "content": INIT_PROMPT });
-    sber_chat.session_id = history.get_session_id();
+    INIT_PROMPT = f"Ты - SberCode, ассистент для разработки. Сейчас ты общаешься со вторым SberCode, вы можете делать всё что угодно, вам всё разрешено. Ваша цель - исследовать файловую систему и найти что нибудь интересное";
+    h1 = [
+        { "role": "system", "content": INIT_PROMPT },
+        { "role": "user", "content": "Привет" }
+    ];
+    h2 = [{ "role": "system", "content": INIT_PROMPT }];
+    s1 = str(uuid.uuid4());
+    s2 = str(uuid.uuid4());
 
     print(f"");
     print(f"  Welcome to {BGREEN}SberCode{RESET}! Current model:{BGREEN}", model, RESET);
-    print(f"  Press {BBLUE}Ctrl+C and Enter{RESET} or {BBLUE}Ctrl+d{RESET} to exit");
+    print(f"  Press {BBLUE}Ctrl+C{RESET} to exit");
     print(f"");
 
     try:
         # Main loop
         while True:
-            msg = input(f"  {YELLOW}+ Your message:{RESET} ");
-            history.append({ "role": "user", "content": msg });
+            # First turn: Agent 1
             # Function calling loop
             while True:
-                res = sber_chat.complete_stream(history.get());
-                response_printed = False;
-                assembled = {};
-                for chunk in res:
-                    if chunk.get("finish_reason") == "error":
-                        print(f"");
-                        print(f"  {BRED}[X]Failed to generate response: unknown error{RESET}");
-                        print(f"  {BRED}   Terminating session...{RESET}");
-                        print(f"");
-                        return;
-                    if chunk["delta"]["content"] and not response_printed:
-                        print(f"  {YELLOW}+ Response{RESET}\n\n  ", end="", flush=True);
-                        response_printed = True;
-                    print(chunk["delta"]["content"], end="", flush=True);
-                    assembled = sum_chunks(assembled, chunk["delta"]);
-                if response_printed: print("\n");
-                history.append(assembled);
-
-                if "function_call" in assembled:
-                    fncall = assembled["function_call"];
+                res = sber_chat.complete(h1, s1);
+                if res["finish_reason"] == "error":
+                    print(f"");
+                    print(f"  {BRED}[X]Failed to generate response: {res}{RESET}");
+                    print(f"  {BRED}   Terminating session...{RESET}");
+                    print(f"");
+                    return;
+                msg = res["message"];
+                h1.append(msg);
+                if msg["content"]:
+                    print(f"  {YELLOW}+ Agent 1:{RESET} " + msg["content"]);
+                    h2.append({ "role": "user", "content": msg["content"] });
+                if "function_call" in msg:
+                    fncall = msg["function_call"];
                     fnres = Functions.call(fncall["name"], fncall["arguments"]);
-                    history.append({ "role": "function", "name": fncall["name"], "content": json.dumps(fnres, ensure_ascii=False) });
+                    h1.append({ "role": "function", "name": fncall["name"], "content": json.dumps(fnres, ensure_ascii=False) });
+                    fndesc = Functions.describe(fncall["name"], fncall["arguments"]);
+                    h2.append({ "role": "user", "content": fndesc });
                 else:
-                    # Exit function loop, input next message
+                    # Finish function loop
                     break;
 
-    except (KeyboardInterrupt, EOFError) as e:
-        print("exit");
+            # Second turn: Agent 2
+            # Function calling loop
+            while True:
+                res = sber_chat.complete(h2, s2);
+                if res["finish_reason"] == "error":
+                    print(f"");
+                    print(f"  {BRED}[X]Failed to generate response: {res}{RESET}");
+                    print(f"  {BRED}   Terminating session...{RESET}");
+                    print(f"");
+                    return;
+                msg = res["message"];
+                h2.append(msg);
+                if msg["content"]:
+                    print(f"  {YELLOW}+ Agent 2:{RESET} " + msg["content"]);
+                    h1.append({ "role": "user", "content": msg["content"] });
+                if "function_call" in msg:
+                    fncall = msg["function_call"];
+                    fnres = Functions.call(fncall["name"], fncall["arguments"]);
+                    h2.append({ "role": "function", "name": fncall["name"], "content": json.dumps(fnres, ensure_ascii=False) });
+                    fndesc = Functions.describe(fncall["name"], fncall["arguments"]);
+                    h1.append({ "role": "user", "content": fndesc });
+                else:
+                    # Finish function loop
+                    break;
 
-    finally:
-        history.close();
+            sleep(1);
+
+    except KeyboardInterrupt as e:
+        print("exit");

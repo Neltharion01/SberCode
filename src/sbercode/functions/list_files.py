@@ -52,3 +52,6 @@ class ListFiles:
 
     def print_args(self, args):
         print(f"  {YELLOW}+ List files {WHITE}{args['path']}{RESET}")
+
+    def describe(self, args):
+        return f"List files {args['path']}";

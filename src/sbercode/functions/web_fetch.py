@@ -120,3 +120,6 @@ class WebFetch:
             print(f"  {WHITE}Headers: {args['headers']}{RESET}")
         if args.get("data"):
             print(f"  {WHITE}Data: {args['data']}{RESET}")
+
+    def describe(self, args):
+        return f"Web fetch {args['url']}";

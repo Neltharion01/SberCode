@@ -20,6 +20,8 @@ class FunctionNotFound:
         return { "error": f"function {self.name} not found" };
     def print_args(self, args):
         print(f"  {BRED}[X] Function {self.name} not found{RESET}");
+    def describe(self, args):
+        return f"Функция {name} не найдена";
 
 class Functions:
     functions = {
@@ -48,3 +50,7 @@ class Functions:
             print(f"  {BRED}[X] {text}{RESET}");
             ret = { "error": text };
         return ret;
+
+    def describe(name, args):
+        f = Functions.functions.get(name, FunctionNotFound(name));
+        return "[FUNCTION CALL] " + f.describe(args);

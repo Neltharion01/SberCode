@@ -62,11 +62,8 @@ RUN_COMMAND_FUNCTION = {
 
 class RunCommand:
     desc = RUN_COMMAND_FUNCTION;
+
     def run(self, args):
-        if args["command"].startswith("rm"):
-            i = input(f"  {BRED}[!!!] ВНИМАНИЕ! ОПАСНАЯ КОМАНДА! Вы точно хотите её выполнить?{RESET} [y/N] ").strip().lower();
-            if i != "y":
-                return { "error": "User denied execution of this command" };
         cmd = subprocess.Popen(["bash", "-c", args["command"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True);
         if args.get("background"):
             return { "status": "command spawned successfully" };
@@ -75,9 +72,13 @@ class RunCommand:
         print(stderr, end="");
         code = cmd.wait();
         return { "status": "success", "stdout": stdout, "stderr": stderr, "exit_code": code };
+
     def print_args(self, args):
         if args.get("background"):
             bg = " &";
         else:
             bg = "";
         print("  " + WHITE + "$ " + args["command"] + bg + RESET);
+
+    def describe(self, args):
+        return f"Run command {args['command']}";

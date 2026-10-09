@@ -50,3 +50,6 @@ class CreateDir:
 
     def print_args(self, args):
         print(f"  {YELLOW}+ Mkdir {WHITE}{args['path']}{RESET}")
+
+    def describe(self, args):
+        return f"Create dir {args['path']}";
