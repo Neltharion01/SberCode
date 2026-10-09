@@ -32,6 +32,7 @@ class SberChat:
     session_id: str = str(uuid.uuid4());
     http: httpx.Client = make_client();
     functions: list[dict] = field(default_factory=list);
+    token_on_save = None;
 
     def get_token(self):
         if self.access_token == None or time()*1000 > self.access_token["expires_at"]:
@@ -45,6 +46,8 @@ class SberChat:
             res = self.http.post(AUTH_URL, headers=headers, data=data);
             res.raise_for_status();
             self.access_token = res.json();
+            if self.token_on_save:
+                self.token_on_save(self.access_token);
         return self.access_token["access_token"];
 
     def build_headers(self):

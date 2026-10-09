@@ -43,6 +43,18 @@ def main():
     sber_chat = SberChat(token, model);
     sber_chat.functions = Functions.serialize();
 
+    try:
+        accfile = open(cfgdir / "access_token.json");
+        sber_chat.access_token = json.load(accfile);
+        accfile.close();
+    except FileNotFoundError: pass;
+
+    def acc_on_save(access_token):
+        accfile = open(cfgdir / "access_token.json", "w");
+        json.dump(access_token, accfile);
+        accfile.close();
+    # Set token on_save function
+    sber_chat.token_on_save = acc_on_save;
     # Refresh access token in background
     Thread(target=sber_chat.get_token).start();
 
