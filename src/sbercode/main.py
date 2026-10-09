@@ -86,6 +86,7 @@ def main():
                 assembled = {};
                 for chunk in res:
                     if chunk.get("finish_reason") == "error":
+                        print(f"");
                         print(f"  {BRED}[X]Failed to generate response: unknown error{RESET}");
                         print(f"  {BRED}   Terminating session...{RESET}");
                         return;
