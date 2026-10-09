@@ -10,6 +10,7 @@ from time import sleep
 from sbercode.api import SberChat;
 from sbercode.colors import *;
 from sbercode.functions import Functions;
+from sbercode.history import History;
 
 def make_cfgdir(home):
     dir = home;
@@ -51,7 +52,10 @@ def main():
         Рабочая директория: {cwd}
         Пользователь разрешил работать с файлами проекта. За пределы папки проекта выходить нельзя
     """;
-    history = [{ "role": "system", "content": INIT_PROMPT }];
+    history = History.load();
+    if not history.get():
+        history.append({ "role": "system", "content": INIT_PROMPT });
+    sber_chat.session_id = history.get_session_id();
 
     print(f"");
     print(f"  Welcome to {BGREEN}SberCode{RESET}! Current model:{BGREEN}", model, RESET);
@@ -65,27 +69,32 @@ def main():
             history.append({ "role": "user", "content": msg });
             # Function calling loop
             while True:
-                res = sber_chat.complete_stream(history);
-                first_chunk = next(res);
-                if first_chunk.get("finish_reason") != "function_call":
-                    assembled = first_chunk["delta"];
-                    print(f"  {YELLOW}+ Response{RESET}\n");
-                    print("  " + first_chunk["delta"]["content"], end="", flush=True);
-                    for chunk in res:
-                        print(chunk["delta"]["content"], end="", flush=True);
-                        assembled = sum_chunks(assembled, chunk["delta"]);
-                    print("\n");
-                    history.append(assembled);
-                    break;
-                else:
-                    # Drain the stream
-                    for chunk in res:
-                        print("[WARN] leftover chunk in function call:", chunk);
-                    delta = first_chunk["delta"];
-                    history.append(delta);
-                    fncall = delta["function_call"];
-                    fnres = Functions.call(fncall["name"], fncall["arguments"]);
-                    history.append({ "role": "function", "name": fncall["name"], "content": json.dumps(fnres) });
+                res = sber_chat.complete_stream(history.get());
+                response_printed = False;
+                assembled = {};
+                for chunk in res:
+                    if chunk.get("finish_reason") == "error":
+                        print(f"  {BRED}[X]Failed to generate response: unknown error{RESET}");
+                        print(f"  {BRED}   Terminating session...{RESET}");
+                        return;
+                    if chunk["delta"]["content"] and not response_printed:
+                        print(f"  {YELLOW}+ Response{RESET}\n\n  ", end="", flush=True);
+                        response_printed = True;
+                    print(chunk["delta"]["content"], end="", flush=True);
+                    assembled = sum_chunks(assembled, chunk["delta"]);
+                if response_printed: print("\n");
+                history.append(assembled);
 
-    except (EOFError) as e:
+                if "function_call" in assembled:
+                    fncall = assembled["function_call"];
+                    fnres = Functions.call(fncall["name"], fncall["arguments"]);
+                    history.append({ "role": "function", "name": fncall["name"], "content": json.dumps(fnres, ensure_ascii=False) });
+                else:
+                    # Exit function loop, input next message
+                    break;
+
+    except (KeyboardInterrupt, EOFError) as e:
         print("exit");
+
+    finally:
+        history.close();
