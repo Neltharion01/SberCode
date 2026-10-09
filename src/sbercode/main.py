@@ -89,6 +89,7 @@ def main():
                         print(f"");
                         print(f"  {BRED}[X]Failed to generate response: unknown error{RESET}");
                         print(f"  {BRED}   Terminating session...{RESET}");
+                        print(f"");
                         return;
                     if chunk["delta"]["content"] and not response_printed:
                         print(f"  {YELLOW}+ Response{RESET}\n\n  ", end="", flush=True);
