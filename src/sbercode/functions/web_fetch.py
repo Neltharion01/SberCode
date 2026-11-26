@@ -1,14 +1,15 @@
 # SPDX-License-Identifier: 0BSD
-# Copyright 2026 GigaChat-3-Ultra
+# Copyright 2026 Neltharion01
 
-import httpx
-from httpx import RequestError
+import httpx;
+from httpx import RequestError;
+from markdownify import MarkdownConverter;
 
-from sbercode.colors import *
+from sbercode.colors import *;
 
 WEB_FETCH_FUNCTION = {
     "name": "web_fetch",
-    "description": "Выполнить HTTP-запрос к веб-ресурсу",
+    "description": "Сделать запрос к веб ресурсу, и получить ответ в markdown формате",
     "parameters": {
         "type": "object",
         "properties": {
@@ -16,31 +17,15 @@ WEB_FETCH_FUNCTION = {
                 "type": "string",
                 "description": "URL-адрес для запроса"
             },
-            "method": {
-                "type": "string",
-                "description": "HTTP-метод (GET, POST, PUT, DELETE, HEAD, PATCH)",
-                "default": "GET"
-            },
-            "headers": {
-                "type": "object",
-                "description": "HTTP-заголовки в формате {\"Header-Name\": \"value\"}",
-                "additionalProperties": {
-                    "type": "string"
-                }
-            },
-            "data": {
-                "type": "string",
-                "description": "Тело запроса (для POST, PUT, PATCH)"
-            },
             "timeout": {
                 "type": "integer",
                 "description": "Таймаут запроса в секундах",
-                "default": 30
+                "default": 10
             },
-            "follow_redirects": {
+            "show_source": {
                 "type": "boolean",
-                "description": "Следовать ли редиректам",
-                "default": True
+                "description": "Показывает оригинальный исходный код страницы в html",
+                "default": False
             }
         },
         "required": ["url"]
@@ -49,36 +34,20 @@ WEB_FETCH_FUNCTION = {
         {
             "request": "Получить главную страницу example.com",
             "params": {
-                "url": "https://example.com",
-                "method": "GET"
-            }
-        },
-        {
-            "request": "Проверить заголовки google.com",
-            "params": {
-                "url": "https://google.com",
-                "method": "HEAD"
+                "url": "https://example.com"
             }
         }
     ],
     "return_parameters": {
         "type": "object",
         "properties": {
-            "status": {
-                "type": "string",
-                "description": "Статус выполнения"
-            },
             "status_code": {
                 "type": "integer",
                 "description": "HTTP-код ответа"
             },
-            "headers": {
-                "type": "object",
-                "description": "Заголовки ответа"
-            },
             "content": {
                 "type": "string",
-                "description": "Тело ответа"
+                "description": "Содержимое ответа"
             },
             "error": {
                 "type": "string",
@@ -88,35 +57,35 @@ WEB_FETCH_FUNCTION = {
     }
 };
 
+class LinkNoTitleConverter(MarkdownConverter):
+    def convert_a(self, el, text, parent_tags):
+        # Принудительно удаляем атрибут title, если он есть
+        el.attrs.pop('title', None);
+        # Вызываем стандартную логику markdownify для ссылок
+        return super().convert_a(el, text, parent_tags);
+
+def markdownify(html, **options):
+    return LinkNoTitleConverter(**options).convert(html);
+
 class WebFetch:
     desc = WEB_FETCH_FUNCTION;
     def run(self, args):
-        method = args.get("method", "GET").upper()
-        url = args["url"]
-        timeout = args.get("timeout", 30)
-        allow_redirects = args.get("follow_redirects", True)
-        headers = args.get("headers", {})
-        data = args.get("data")
+        url = args["url"];
+        timeout = args.get("timeout", 10);
 
-        with httpx.Client(http2=True, follow_redirects=allow_redirects, timeout=timeout) as client:
-            response = client.request(
-                method=method,
-                url=url,
-                headers=headers,
-                data=data.encode() if data else None
-            )
+        with httpx.Client(http2=True, follow_redirects=True, timeout=timeout) as client:
+            response = client.get(url);
         print(f"  {WHITE}{response.status_code} {response.reason_phrase}");
+        text = response.text;
+        if not args.get("show_source"):
+            text = markdownify(text);
         return {
-            "status": "success",
             "status_code": response.status_code,
-            "headers": dict(response.headers),
-            "content": response.text
+            "content": text
         }
 
     def print_args(self, args):
-        method = args.get("method", "GET").upper()
-        print(f"  {WHITE}{method} {args['url']}{RESET}")
-        if args.get("headers"):
-            print(f"  {WHITE}Headers: {args['headers']}{RESET}")
-        if args.get("data"):
-            print(f"  {WHITE}Data: {args['data']}{RESET}")
+        src = "";
+        if args.get("show_source"):
+            src = f"{YELLOW} (show_source=True)";
+        print(f"  {YELLOW}+ Web fetch {WHITE}{args['url']}{src}{RESET}")
