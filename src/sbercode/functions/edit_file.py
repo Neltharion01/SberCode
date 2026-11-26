@@ -22,7 +22,7 @@ EDIT_FILE_FUNCTION = {
                 "description": "На что заменяем"
             }
         },
-        "required": [ "file_name", "contents" ]
+        "required": [ "file_name", "replace_from", "replace_to" ]
     },
     "few_shot_examples": [
         {
