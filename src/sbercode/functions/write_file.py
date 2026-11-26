@@ -16,6 +16,11 @@ WRITE_FILE_FUNCTION = {
             "contents": {
                 "type": "string",
                 "description": "Содержимое файла"
+            },
+            "overwrite": {
+                "type": "boolean",
+                "description": "Если True, перезапишет файл, если он существует",
+                "default": False
             }
         },
         "required": [ "file_name", "contents" ]
@@ -47,12 +52,18 @@ WRITE_FILE_FUNCTION = {
 class WriteFile:
     desc = WRITE_FILE_FUNCTION;
     def run(self, args):
-        f = open(args["file_name"], "x");
-        f.write(args["contents"]);
-        if args["contents"][-1] != "\n":
-            f.write("\n");
-        f.close();
-        return { "status": "success" };
+        mode = "x"
+        if args.get("overwrite", False):
+            mode = "w"
+        try:
+            f = open(args["file_name"], mode);
+            f.write(args["contents"]);
+            if args["contents"][-1] != "\n":
+                f.write("\n");
+            f.close();
+            return { "status": "success" };
+        except FileExistsError:
+            return { "error": f"File '{args['file_name']}' already exists. Use overwrite=True to replace it." }
     def print_args(self, args):
         print(f"  {YELLOW}+ Write file {WHITE}{args["file_name"]}{RESET}");
         for line in args["contents"].splitlines():
