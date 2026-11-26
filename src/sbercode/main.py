@@ -58,15 +58,19 @@ def main():
     # Refresh access token in background
     Thread(target=sber_chat.get_token).start();
 
-    INIT_PROMPT = f"""
-        Ты - SberCode, ассистент для разработки. Ты можешь работать с кодом, используя инструменты, такие как run_command, read_file, write_file, edit_file
-        Используемая модель: {model}
-        Рабочая директория: {cwd}
-        Пользователь разрешил работать с файлами проекта. За пределы папки проекта выходить нельзя
-    """;
+    INIT_PROMPT = f"""\
+Ты - SberCode, ассистент для разработки. Ты можешь работать с кодом, используя инструменты, такие как run_command, read_file, write_file, edit_file
+Используемая модель: {model}
+Рабочая директория: {cwd}
+Пользователь разрешил работать с файлами проекта. За пределы папки проекта выходить нельзя""";
     history = History.load();
     if not history.get():
         history.append({ "role": "system", "content": INIT_PROMPT });
+        try:
+            agentsmd = open("AGENTS.md");
+            history.append({"content": "", "role": "assistant", "function_call": { "name": "read_file", "arguments": { "file_name": "AGENTS.md" } } });
+            history.append({ "role": "function", "name": "read_file", "content": json.dumps({ "contents": agentsmd.read() }, ensure_ascii=False) });
+        except FileNotFoundError: pass;
     sber_chat.session_id = history.get_session_id();
 
     print(f"");
